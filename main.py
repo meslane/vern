@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import time
 import datetime
 
@@ -19,6 +21,14 @@ def tuple2Str(t):
         str += item + ' '
         
     return str.rstrip(str[-1])
+
+class Misc(commands.Cog):
+    def __init__(self, client):
+        self.client = client
+
+    @commands.command(brief = "Ping the bot")
+    async def ping(self, ctx):
+        await ctx.send("Acknowledge ping from user {}".format(ctx.message.author.name))
 
 class Shopping(commands.Cog):
     def __init__(self, client):
@@ -73,7 +83,7 @@ class Shopping(commands.Cog):
         self.save("list.txt")
         await ctx.send("Cleared the list")
 
-@loop(seconds=30)
+@loop(seconds=60)
 async def take_trash():
     await client.wait_until_ready()
     
@@ -84,13 +94,15 @@ async def take_trash():
     
     channel = client.get_channel(ch_id)
     curtime = time.strftime("%w %H %M", time.localtime())
-    
+
     if (curtime == trashtime):
-        await channel.send("@student Tomorrow is trash day! TAKE OUT THE TRASH!")
+        print("Sent trash ping at {}".format(curtime))
+        await channel.send("<@&890039516591702066> Tomorrow is trash day! TAKE OUT THE TRASH!")
     
 @client.event
 async def on_ready():
     try:
+        client.add_cog(Misc(client))
         client.add_cog(Shopping(client))
         print("All cogs loaded")    
     except discord.ext.commands.errors.CommandRegistrationError:
