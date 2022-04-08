@@ -66,16 +66,27 @@ class Shopping(commands.Cog):
         await ctx.send("Added {} to the list".format(item))
     
     @commands.command(brief = "Drop item from shopping list")
-    async def drop(self, ctx, index):
-        try:
-            if int(index) < 0:
-                raise IndexError
-            
-            removed = self.shop_list.pop(int(index) - 1)
-            self.save("list.txt")
-            await ctx.send("Removed {} from the list".format(removed))
-        except IndexError:
-            await ctx.send("Could not remove that item from the list")    
+    async def drop(self, ctx, *indices):
+        indexlist = []
+
+        for index in indices:
+            try:
+                indexlist.append(int(index))
+            except ValueError:
+                await ctx.send("{} is not a valid list index".format(index))
+
+        indexlist.sort(reverse=True)
+
+        for index in indexlist:
+            try:
+                if int(index) < 0:
+                    raise IndexError
+                
+                removed = self.shop_list.pop(int(index) - 1)
+                self.save("list.txt")
+                await ctx.send("Removed {} from the list".format(removed))
+            except IndexError:
+                await ctx.send("Could not remove that item from the list")    
     
     @commands.command(brief = "Clear the entire shopping list")
     async def clear(self, ctx):
